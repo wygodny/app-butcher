@@ -1,7 +1,7 @@
 #app-butcher
 ##Project cleaner
 
-1. Create config file like config.json:
+###Create config file like config.json:
 ```
 {
 	"projectPath": "/home/user/testProject",
@@ -24,7 +24,7 @@
 	]
 }
 ```
-2. run
+###run
 ```
 node bin/appbutcher.js -f ~/config.json
 ```
