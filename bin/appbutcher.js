@@ -67,7 +67,7 @@ const steps = {
     fs.readdirSync(dirPath).forEach(function(file,index){
       const curPath = dirPath + "/" + file
       if(fs.lstatSync(curPath).isDirectory()) { 
-        deleteFolderRecursive(curPath)
+        steps.rmdir(null, null, curPath)
       } else { 
         fs.unlinkSync(curPath)
       }
