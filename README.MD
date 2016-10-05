@@ -32,9 +32,16 @@
 }
 ```
 
+###Install
+```
+git clone https://github.com/wygodny/app-butcher.git
+cd app-butcher
+sudo npm link
+```
+
 ###Run
 ```
-node bin/appbutcher.js -f ~/config.json
+appbutcher -f ~/config.json
 ```
 
 ###Steps

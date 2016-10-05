@@ -26,7 +26,7 @@
   ],
   "preferGlobal": true,
   "bin": {
-    "appbutcher": "./bin/appbutcher"
+    "appbutcher": "./bin/appbutcher.js"
   },
   "main": "index.js",
   "engines": {
