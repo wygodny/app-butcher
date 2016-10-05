@@ -4,27 +4,41 @@
 ###Create config file like config.json:
 ```
 {
-	"projectPath": "/home/user/testProject",
-	"remove": [
-		"a.js",
-		"b/c.js"
-	],
-	"clean": [
-		"d.js"
-	],
-	"filter": [
+	"projectPath": "/home/{userName}/testProject",
+	"steps": [
 		{
-			"path": "e.js",
-			"lines": 2,
-			"match": "remove_me"
+			"type": "remove",
+			"paths": [
+				{ "path": "file.js" },
+				{ "path": "dir/file.js" }
+			]
+		}, {
+			"type": "clean",
+			"paths": [
+				{ "path": "file2.js" }
+			]
+		}, {
+			"type": "filter",
+			"paths": [
+				{ "path": "file3.js", "lines": 2, "match": "remove_me" }
+			]
+		}, {
+			"type": "rmdir",
+			"paths": [
+				{ "path": "dir-path" }
+			]
 		}
-	],
-	"rmdirs": [
-		"e"	
 	]
 }
 ```
-###run
+
+###Run
 ```
 node bin/appbutcher.js -f ~/config.json
 ```
+
+###Steps
+remove - Remove files 
+clean - Set empty file content
+filter - Remove number of lines from file
+rmdir - Remove directory recursively

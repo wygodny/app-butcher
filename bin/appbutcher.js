@@ -1,129 +1,95 @@
 #!/usr/bin/env node
+'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var log = require('verbalize');
-var argv = require('minimist')(process.argv.slice(2));
-var path = require('path');
+const fs = require('fs')
+const path = require('path')
+const log = require('verbalize')
+const argv = require('minimist')(process.argv.slice(2))
+const _ = require('underscore')
 
+log.runner = 'app-butcher'
 
-/**
- * Everything in the file should be customized
- */
-
-
-// Verbalize `runner`
-log.runner = 'app-butcher';
-
-// Use `-f` or `--file` to specify the source file
-var file  = argv.f || argv.file
+const file  = argv.f || argv.file
 
 if (!file) {
-  log.error('Please provide a config file [-f, -file]');
+  log.error('Please provide a config file [-f, -file]')
   process.exit(1)
 }
 
-/**
- * Application
- */
-
 if (!fs.existsSync(file)) {
-  log.error('Config file not found!');
+  log.error('Config file not found!')
   process.exit(2)
 }
 
-var config = null
+let config = null
 
 try {
   config = JSON.parse(fs.readFileSync(file, 'utf8'))
-} catch (e) { }
+} catch (e) {
+  log.error(e)
+}
 
 if (!config || !config.projectPath) {
-  log.error('Invalid config file!');
+  log.error('Invalid config file!')
   process.exit(3)
 }
 
-if (config.remove) {
-  log("Removing files ...")
-  for (var i = 0, length = config.remove.length; i < length; i+=1) {
-    var filePath = path.join(config.projectPath, config.remove[i])
-    if (filePath) {
-      try {
-        fs.unlinkSync(path.normalize(filePath));
-      } catch(e) {
-        log(e)
-      }
-    }
-  }
-  log("Removing files done")
-}
+const steps = {
+  remove: (stepConfig, info, filePath)=> {
+    fs.unlinkSync(path.normalize(filePath))
+  },
+  clean: (stepConfig, info, filePath)=> {
+    fs.truncateSync(path.normalize(filePath), 0)
+  },
+  filter: (stepConfig, info, filePath)=> {
+    const lines = info.lines
+    const match = info.match
 
-if (config.remove) {
-  log("Cleaning files ...")
-  for (var i = 0, length = config.clean.length; i < length; i+=1) {
-    var filePath = path.join(config.projectPath, config.clean[i])
-    if (filePath) {
-      try {
-        fs.truncateSync(path.normalize(filePath), 0);
-      } catch(e) {
-        log(e)
-      }
-    }
-  }
-  log("Cleaning files done")
-}
-
-if (config.remove) {
-  log("Filtering files ...")
-  for (var i = 0, length = config.filter.length; i < length; i+=1) {
-    var fileInfo = config.filter[i]
-
-    if (fileInfo) {
-      var filePath = path.join(config.projectPath, fileInfo.path)
-      var lines = fileInfo.lines
-      var match = fileInfo.match
-
-      try {
-        var data = fs.readFileSync(filePath, 'utf8')
-        var dataArray = data.split('\n')
-        var lastIndex = function() {
-          for (var j = dataArray.length - 1; j > -1; j -= 1) {
-            if (dataArray[j].match(match)) return j;
-          }
-        }();
-
-        for (var k = lastIndex; k < (lastIndex + lines); k+=1) {
-          dataArray[k] = ''
+    try {
+      const data = fs.readFileSync(filePath, 'utf8')
+      let dataArray = data.split('\n')
+      const lastIndex = function() {
+        for (let j = dataArray.length - 1; j > -1; j -= 1) {
+          if (dataArray[j].match(match)) return j;
         }
-        fs.unlinkSync(filePath)
-        fs.writeFileSync(filePath, dataArray.join('\n'))
-      } catch(e) {
-        log(e)
+      }()
+
+      for (let k = lastIndex; k < (lastIndex + lines); k+=1) {
+        dataArray[k] = ''
       }
+      fs.unlinkSync(filePath)
+      fs.writeFileSync(filePath, dataArray.join('\n'))
+    } catch(e) {
+      log(e)
     }
+  },
+  rmdir:(stepConfig, info, dirPath)=> {
+    fs.readdirSync(dirPath).forEach(function(file,index){
+      const curPath = dirPath + "/" + file
+      if(fs.lstatSync(curPath).isDirectory()) { 
+        deleteFolderRecursive(curPath)
+      } else { 
+        fs.unlinkSync(curPath)
+      }
+    })
+    fs.rmdirSync(dirPath)
   }
-  log("Filtering files done")
 }
 
-if (config.remove) {
-  log("Removing dirs ...")
-  for (var i = 0, length = config.rmdirs.length; i < length; i+=1) {
-    var path = path.join(config.projectPath, config.rmdirs[i])
-    if (path) {
+_.each(config.steps, (stepConfig)=> {
+  if (stepConfig) {
+    log(`Step ${stepConfig.type} :: starting`)
+    _.each(stepConfig.paths, (info)=> {
       try {
-        fs.readdirSync(path).forEach(function(file,index){
-          var curPath = path + "/" + file;
-          if(fs.lstatSync(curPath).isDirectory()) { // recurse
-            deleteFolderRecursive(curPath);
-          } else { // delete file
-            fs.unlinkSync(curPath);
-          }
-        });
-        fs.rmdirSync(path);
+        let filePath = path.join(config.projectPath, info.path)
+        log(`\t${filePath}`)
+        steps[stepConfig.type](stepConfig, info, filePath)
       } catch(e) {
-        log(e)
+        log.error(e)
       }
-    }
+    })
+    log(`Step ${stepConfig.type} :: done`)
   }
-  log("Removing dirs done")
-}
+})
+
+log('All done :)')
