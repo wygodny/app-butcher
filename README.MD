@@ -38,7 +38,7 @@ node bin/appbutcher.js -f ~/config.json
 ```
 
 ###Steps
-remove - Remove files 
-clean - Set empty file content
-filter - Remove number of lines from file
-rmdir - Remove directory recursively
+- remove - Remove files 
+- clean - Set empty file content
+- filter - Remove number of lines from file
+- rmdir - Remove directory recursively
