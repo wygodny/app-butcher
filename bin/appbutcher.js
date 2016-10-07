@@ -30,8 +30,7 @@ const steps = {
         if (dataArray[j].match(match)) return j;
       }
     }()
-
-    for (let k = lastIndex; k < (lastIndex + lines); k+=1) {
+    for (let k = lastIndex; k < (lastIndex + parseInt(lines)); k+=1) {
       dataArray[k] = ''
     }
     fs.unlinkSync(filePath)
