@@ -44,6 +44,10 @@ rmdir dir-path
 
 ###Install
 ```
+sudo npm install -g app-butcher
+```
+or
+```
 git clone https://github.com/wygodny/app-butcher.git
 cd app-butcher
 sudo npm link
@@ -52,7 +56,10 @@ sudo npm link
 ###Run
 ```
 appbutcher -f ~/config.json
-appbutcher -p ~/my-project-dir
+```
+or
+```
+appbutcher -p /my-project-dir-path
 ```
 
 ###Steps
