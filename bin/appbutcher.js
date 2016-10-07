@@ -10,38 +10,16 @@ const _ = require('underscore')
 log.runner = 'app-butcher'
 
 const file  = argv.f || argv.file
-
-if (!file) {
-  log.error('Please provide a config file [-f, -file]')
-  process.exit(1)
-}
-
-if (!fs.existsSync(file)) {
-  log.error('Config file not found!')
-  process.exit(2)
-}
-
-let config = null
-
-try {
-  config = JSON.parse(fs.readFileSync(file, 'utf8'))
-} catch (e) {
-  log.error(e)
-}
-
-if (!config || !config.projectPath) {
-  log.error('Invalid config file!')
-  process.exit(3)
-}
+const projectPath  = argv.p || argv.project
 
 const steps = {
-  remove: (stepConfig, info, filePath)=> {
+  remove: (info, filePath)=> {
     fs.unlinkSync(path.normalize(filePath))
   },
-  clean: (stepConfig, info, filePath)=> {
+  clean: (info, filePath)=> {
     fs.truncateSync(path.normalize(filePath), 0)
   },
-  filter: (stepConfig, info, filePath)=> {
+  filter: (info, filePath)=> {
     const lines = info.lines
     const match = info.match
 
@@ -60,10 +38,10 @@ const steps = {
       fs.unlinkSync(filePath)
       fs.writeFileSync(filePath, dataArray.join('\n'))
     } catch(e) {
-      log(e)
+      log.error(`\t${e}`)
     }
   },
-  rmdir:(stepConfig, info, dirPath)=> {
+  rmdir:(info, dirPath)=> {
     fs.readdirSync(dirPath).forEach(function(file,index){
       const curPath = dirPath + "/" + file
       if(fs.lstatSync(curPath).isDirectory()) { 
@@ -76,20 +54,77 @@ const steps = {
   }
 }
 
-_.each(config.steps, (stepConfig)=> {
-  if (stepConfig) {
-    log(`Step ${stepConfig.type} :: starting`)
-    _.each(stepConfig.paths, (info)=> {
-      try {
-        let filePath = path.join(config.projectPath, info.path)
-        log(`\t${filePath}`)
-        steps[stepConfig.type](stepConfig, info, filePath)
-      } catch(e) {
-        log.error(e)
-      }
-    })
-    log(`Step ${stepConfig.type} :: done`)
+if (file) {
+  if (!fs.existsSync(file)) {
+    log.error('Config file not found!')
+    process.exit(2)
   }
-})
+
+  let config = null
+
+  try {
+    config = JSON.parse(fs.readFileSync(file, 'utf8'))
+  } catch (e) {
+    log.error(e)
+  }
+
+  if (!config || !config.projectPath) {
+    log.error('Invalid config file!')
+    process.exit(3)
+  }
+
+  _.each(config.steps, (stepConfig)=> {
+    if (stepConfig) {
+      _.each(stepConfig.paths, (info)=> {
+        try {
+          let filePath = path.join(config.projectPath, info.path)
+          log(`${stepConfig.type} :: ${filePath}`)
+          steps[stepConfig.type](info, filePath)
+        } catch(e) {
+          log.error(e)
+        }
+      })
+      log(`Step ${stepConfig.type} :: done`)
+    }
+  })
+} else if (projectPath) {
+  if (!fs.existsSync(projectPath)) {
+    log.error('Project dir not found!')
+    process.exit(3)
+  }
+  const configFile = path.join(projectPath, 'app-butcher.conf')
+  if (!fs.existsSync(configFile)) {
+    log.error(`${configFile} file not found!`)
+    process.exit(4)
+  }
+
+  let config
+  try {
+    config = fs.readFileSync(configFile, 'utf8')
+  } catch(e) {
+    log.error(e)
+  }
+
+  let fileLines = config.split('\n')  
+  _.each(fileLines, function(line) {
+    var fields = line.trim().split(' ')
+    if (fields.length >= 2 && fields[0]) {
+      try {
+        let filePath = path.join(projectPath, fields[1])
+        log(`${fields[0]} :: ${filePath}`)
+        steps[fields[0]]({
+          path: fields[1],
+          lines: fields[2],
+          match: fields[3],
+        }, filePath)
+      } catch(e) {
+        log.error(`\t${e}`)
+      }
+    }
+  })
+} else {
+  log.error('Please provide a config file [-f, -file] or project path [-p, -project]')
+  process.exit(5)
+}
 
 log('All done :)')

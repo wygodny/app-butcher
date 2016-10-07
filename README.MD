@@ -32,6 +32,16 @@
 }
 ```
 
+###Create app-butcher.conf config file inside project main dir:
+```
+remove file.js
+remove dir.file.js
+clean file2.js
+filter file3.js 2 remove_me
+rmdir dir-path
+```
+
+
 ###Install
 ```
 git clone https://github.com/wygodny/app-butcher.git
@@ -42,6 +52,7 @@ sudo npm link
 ###Run
 ```
 appbutcher -f ~/config.json
+appbutcher -p ~/my-project-dir
 ```
 
 ###Steps
