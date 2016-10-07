@@ -107,7 +107,7 @@ if (file) {
 
   let fileLines = config.split('\n')  
   _.each(fileLines, function(line) {
-    var fields = line.trim().split(' ')
+    let fields = line.trim().split(' ')
     if (fields.length >= 2 && fields[0]) {
       try {
         let filePath = path.join(projectPath, fields[1])
