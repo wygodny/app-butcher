@@ -23,23 +23,19 @@ const steps = {
     const lines = info.lines
     const match = info.match
 
-    try {
-      const data = fs.readFileSync(filePath, 'utf8')
-      let dataArray = data.split('\n')
-      const lastIndex = function() {
-        for (let j = dataArray.length - 1; j > -1; j -= 1) {
-          if (dataArray[j].match(match)) return j;
-        }
-      }()
-
-      for (let k = lastIndex; k < (lastIndex + lines); k+=1) {
-        dataArray[k] = ''
+    const data = fs.readFileSync(filePath, 'utf8')
+    let dataArray = data.split('\n')
+    const lastIndex = function() {
+      for (let j = dataArray.length - 1; j > -1; j -= 1) {
+        if (dataArray[j].match(match)) return j;
       }
-      fs.unlinkSync(filePath)
-      fs.writeFileSync(filePath, dataArray.join('\n'))
-    } catch(e) {
-      log.error(`\t${e}`)
+    }()
+
+    for (let k = lastIndex; k < (lastIndex + lines); k+=1) {
+      dataArray[k] = ''
     }
+    fs.unlinkSync(filePath)
+    fs.writeFileSync(filePath, dataArray.join('\n'))
   },
   rmdir:(info, dirPath)=> {
     fs.readdirSync(dirPath).forEach(function(file,index){
@@ -54,13 +50,12 @@ const steps = {
   }
 }
 
-if (file) {
+const jsonMode = ()=> {
+  let config
   if (!fs.existsSync(file)) {
     log.error('Config file not found!')
     process.exit(2)
   }
-
-  let config = null
 
   try {
     config = JSON.parse(fs.readFileSync(file, 'utf8'))
@@ -87,7 +82,10 @@ if (file) {
       log(`Step ${stepConfig.type} :: done`)
     }
   })
-} else if (projectPath) {
+}
+
+const projectMode = ()=> {
+  let config
   if (!fs.existsSync(projectPath)) {
     log.error('Project dir not found!')
     process.exit(3)
@@ -98,7 +96,6 @@ if (file) {
     process.exit(4)
   }
 
-  let config
   try {
     config = fs.readFileSync(configFile, 'utf8')
   } catch(e) {
@@ -122,6 +119,12 @@ if (file) {
       }
     }
   })
+}
+
+if (file) {
+  jsonMode()
+} else if (projectPath) {
+  projectMode()
 } else {
   log.error('Please provide a config file [-f, -file] or project path [-p, -project]')
   process.exit(5)
