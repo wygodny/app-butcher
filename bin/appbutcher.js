@@ -40,7 +40,7 @@ const steps = {
     fs.readdirSync(dirPath).forEach(function(file,index){
       const curPath = dirPath + "/" + file
       if(fs.lstatSync(curPath).isDirectory()) { 
-        steps.rmdir(null, null, curPath)
+        steps.rmdir(null, curPath)
       } else { 
         fs.unlinkSync(curPath)
       }
