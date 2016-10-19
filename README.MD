@@ -1,7 +1,21 @@
 #app-butcher
 ##Project cleaner
 
-###Create config file like config.json:
+###Install
+```
+sudo npm install -g app-butcher
+```
+
+###Create app-butcher.conf config file inside project main dir:
+```
+remove file.js
+remove dir.file.js
+clean file2.js
+filter file3.js 2 remove_me
+rmdir dir-path
+```
+
+###or create config file like config.json:
 ```
 {
 	"projectPath": "/home/{userName}/testProject",
@@ -32,34 +46,13 @@
 }
 ```
 
-###Create app-butcher.conf config file inside project main dir:
-```
-remove file.js
-remove dir.file.js
-clean file2.js
-filter file3.js 2 remove_me
-rmdir dir-path
-```
-
-
-###Install
-```
-sudo npm install -g app-butcher
-```
-or
-```
-git clone https://github.com/wygodny/app-butcher.git
-cd app-butcher
-sudo npm link
-```
-
 ###Run
 ```
-appbutcher -f ~/config.json
+appbutcher -p /my-project-dir-path
 ```
 or
 ```
-appbutcher -p /my-project-dir-path
+appbutcher -f ~/config.json
 ```
 
 ###Steps

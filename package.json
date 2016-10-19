@@ -1,7 +1,7 @@
 {
   "name": "app-butcher",
   "description": "App butcher - Project cleaner",
-  "version": "0.1.10",
+  "version": "0.2.1",
   "homepage": "https://github.com/Wygodny/app-butcher",
   "author": {
     "name": "Kamil",
@@ -24,7 +24,10 @@
     "cli",
     "command line",
     "project cleaner",
-    "cleaner"
+    "cleaner",
+    "removal tool",
+    "removal",
+    "remove"
   ],
   "preferGlobal": true,
   "bin": {
