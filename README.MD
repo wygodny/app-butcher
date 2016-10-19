@@ -2,6 +2,10 @@
 ##Project cleaner
 
 [![Known Vulnerabilities](https://snyk.io/test/npm/app-butcher/badge.svg)](https://snyk.io/test/npm/app-butcher)
+[![bitHound Overall Score](https://www.bithound.io/github/wygodny/app-butcher/badges/score.svg)](https://www.bithound.io/github/wygodny/app-butcher)
+[![bitHound Dependencies](https://www.bithound.io/github/wygodny/app-butcher/badges/dependencies.svg)](https://www.bithound.io/github/wygodny/app-butcher/master/dependencies/npm)
+[![bitHound Code](https://www.bithound.io/github/wygodny/app-butcher/badges/code.svg)](https://www.bithound.io/github/wygodny/app-butcher)
+[![bitHound Dev Dependencies](https://www.bithound.io/github/wygodny/app-butcher/badges/devDependencies.svg)](https://www.bithound.io/github/wygodny/app-butcher/master/dependencies/npm)
 
 ###Install
 ```
