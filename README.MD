@@ -1,6 +1,8 @@
 #app-butcher
 ##Project cleaner
 
+[![Known Vulnerabilities](https://snyk.io/test/npm/app-butcher/badge.svg)](https://snyk.io/test/npm/app-butcher)
+
 ###Install
 ```
 sudo npm install -g app-butcher
